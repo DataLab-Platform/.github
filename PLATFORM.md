@@ -60,6 +60,7 @@ The guiding principle: **one processing catalog, one object model, one workspace
 | 2025-11 | **DataLab v1.0.0** released — complete rewrite using Sigima as its processing backend. DCAR completed. |
 | 2026 | **DEW project** (DataLab Experimental Web Interface, funded by NLnet / NGI0 Commons Fund): browser-native reimplementation. |
 | 2026-06-26 | DEW Task 1 (feature-rich browser-native DataLab) fully delivered — [live demo](https://datalab-platform.com/web/) with off-thread runtime, on-disk storage, internationalization (EN/FR). |
+| 2026-07 | DataLab desktop [packaged for NixOS](https://ngi.nixos.org/app/datalab) by the [Nix@NGI team](https://nixos.org/community/teams/ngi/) (NLnet partner) and published on the NGI Forge. |
 
 Full project reports and Architecture Decision Records are published on the [DataLab wiki](https://github.com/DataLab-Platform/DataLab/wiki).
 
@@ -209,6 +210,7 @@ What is **not** different: the object model (`SignalObj`, `ImageObj`, ROIs, grou
 - **Funding**: two projects funded by the [NLnet Foundation](https://nlnet.nl/) through the NGI0 Commons Fund:
   - **DCAR** (DataLab Core Architecture Redesign) — completed December 2025 with Sigima v1.0.0 and DataLab v1.0.0,
   - **DEW** (DataLab Experimental Web Interface) — in progress; Task 1 (browser-native application) delivered June 2026.
+- **Distribution**: as part of this NGI funding, the desktop application has been packaged for [NixOS](https://nixos.org/) by the [Nix@NGI team](https://nixos.org/community/teams/ngi/) (an NLnet partner) and is available from the [NGI Forge](https://ngi.nixos.org/app/datalab).
 - **GenAI policy**: development follows the [NLnet policy on generative AI](https://nlnet.nl/foundation/policies/generativeAI/) — AI is a development aid only; review, architecture and scientific validation remain under human responsibility, and AI-assisted commits are labelled.
 - **Industrial backing**: DataLab was born from industrial needs (test benches, metrology) and is maintained with the support of [CODRA](https://codra.net/).
 

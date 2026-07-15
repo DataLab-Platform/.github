@@ -38,10 +38,12 @@ All projects are released under the **BSD 3-Clause** license.
   </tr>
 </table>
 
+As part of this funding, the desktop application has been packaged for <a href="https://nixos.org/">NixOS</a> by the <a href="https://nixos.org/community/teams/ngi/">Nix@NGI team</a> (an NLnet partner) and is available from the <a href="https://ngi.nixos.org/app/datalab">NGI Forge</a>.
+
 The Qt visualization foundation lives in the sibling [PlotPyStack](https://github.com/PlotPyStack) organization (guidata, PythonQwt, PlotPy).
 
 ---
 
 <p align="center">
-  <a href="https://datalab-platform.com/">Website</a> · <a href="https://datalab-platform.com/web/">Live web demo</a> · <a href="https://github.com/DataLab-Platform/DataLab/wiki">Project reports & ADRs</a>
+  <a href="https://datalab-platform.com/">Website</a> · <a href="https://datalab-platform.com/web/">Live web demo</a> · <a href="https://ngi.nixos.org/app/datalab">NixOS package</a> · <a href="https://github.com/DataLab-Platform/DataLab/wiki">Project reports & ADRs</a>
 </p>
