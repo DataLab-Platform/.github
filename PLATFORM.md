@@ -242,15 +242,17 @@ What is **not** different: the object model (`SignalObj`, `ImageObj`, ROIs, grou
 
 ## Technology stacks
 
+The table describes the next development releases: the Desktop packages and PlotPyStack require Python 3.10 or later. Already published releases retain their own Python requirements; archived reports describe the environments actually tested at the time.
+
 | Product | Version | Core stack |
 | --- | --- | --- |
-| DataLab (desktop) | 1.x | Python 3.9+, Qt (SigimaX ≥ 1.1, PlotPy ≥ 2.11, guidata ≥ 3.16), Sigima ≥ 1.3, DataLab-Capsule, NumPy, SciPy, scikit-image, OpenCV, FastAPI (Web API) |
-| Sigima | 1.x | Python 3.9+, NumPy, SciPy, scikit-image, pandas, guidata (parameters only) — no GUI dependency |
-| SigimaX | 1.x | Python 3.9+, Qt (PlotPy ≥ 2.11, guidata ≥ 3.15), Sigima ≥ 1.3, psutil |
+| DataLab (desktop) | 1.x | Python 3.10+, Qt (SigimaX ≥ 1.1, PlotPy ≥ 2.11, guidata ≥ 3.16), Sigima ≥ 1.3, DataLab-Capsule, NumPy, SciPy, scikit-image, OpenCV, FastAPI (Web API) |
+| Sigima | 1.x | Python 3.10+, NumPy, SciPy, scikit-image, pandas, guidata (parameters only) — no GUI dependency |
+| SigimaX | 1.x | Python 3.10+, Qt (PlotPy ≥ 2.11, guidata ≥ 3.15), Sigima ≥ 1.3, psutil |
 | DataLab-Web | 0.x | TypeScript, React, Plotly.js, Vite, Pyodide (pinned, worker runtime), Sigima, DataLab-Capsule, Vitest, Playwright |
-| DataLab-Kernel | 0.x | Xeus-Python, Plotly / Matplotlib backends, DataLab Web API client |
-| DataLab-Capsule | 0.x | Python 3.9+ / Pyodide, jsonschema, NumPy & h5py (`hdf5` extra), FastAPI & uvicorn (`registry` extra) |
-| PlotPyStack (foundation) | — | guidata, PythonQwt, PlotPy (Qt via QtPy: PyQt5/PyQt6/PySide6) |
+| DataLab-Kernel | 0.x | Python 3.10+, Xeus-Python, Plotly / Matplotlib backends, DataLab Web API client |
+| DataLab-Capsule | 0.x | Python 3.10+ / Pyodide, jsonschema, NumPy & h5py (`hdf5` extra), FastAPI & uvicorn (`registry` extra) |
+| PlotPyStack (foundation) | — | Python 3.10+, guidata, PythonQwt, PlotPy (Qt via QtPy: PyQt5/PyQt6/PySide6) |
 
 ## Quality and testing
 
