@@ -34,9 +34,9 @@ DataLab and DataLab-Web share a portable plugin architecture and an **Applicatio
 ## Highlights
 
 - 🧪 **Built on the scientific Python stack**: NumPy, SciPy, scikit-image, OpenCV, pandas — with a rich catalog of processing and analysis features for signals and images.
-- 🔁 **Interoperable by design**: HDF5 workspaces and renderer-independent plot annotations flow freely between desktop, browser, and notebooks; results are identical everywhere.
+- 🔁 **Interoperable by design**: HDF5 workspaces and renderer-independent plot annotations flow freely between desktop, browser, and notebooks; shared operation contracts and replay qualification make results verifiable across editions.
 - 🧾 **Verifiable provenance & open capsules**: End-to-end provenance recording (`/DataLab_Provenance`), deterministic recomputation checks, and open RO-Crate `.dlcapsule` archives with revisions, reviews, light attachments, and an optional registry.
-- 🔒 **Privacy-first web edition**: DataLab-Web runs entirely client-side in a background Web Worker with optional OPFS disk spill — your data never leaves your machine.
+- 🔒 **Privacy-first web edition**: DataLab-Web runs entirely client-side in a background Web Worker with optional OPFS disk spill — processing never requires uploading your data (the AI assistant and capsule registry are optional services).
 - 🧩 **Extensible & automated**: Applications catalog & instrument simulators, one-click plugin catalog, `datalab-plugin` scaffolding CLI, Python macros, History recording/replay, built-in AI assistant, XML-RPC & HTTP Web API, TypeScript SDK.
 - 🌍 **Localized**: English and French (user interface and documentation).
 

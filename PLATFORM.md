@@ -42,7 +42,7 @@ What started in 2023 as a single desktop application has grown into a family of 
 - an **open workspace provenance and capsule package** (DataLab-Capsule) for exchanging, comparing, and verifying analyses across editions,
 - a **plugin catalog and official application plugins** extending both Desktop and Web with domain-specific workflows and instrument simulators.
 
-The guiding principle: **one processing catalog, one object model, one workspace and provenance format — several access modes**. Results are identical for the same inputs, whichever edition you use, and HDF5 workspaces and `.dlcapsule` archives flow freely between them.
+The guiding principle: **one processing catalog, one object model, one workspace and provenance format — several access modes**. The same operation applied to the same imported data with compatible Sigima versions gives the same result in every edition — exactly, or within the comparison rule declared by the operation's replay qualification — and HDF5 workspaces and `.dlcapsule` archives flow freely between them. Editions may run different Sigima versions (DataLab-Web pins its own) and keep their own file importers, so equivalence is a verified property of each operation, not a blanket promise.
 
 ## Terminology
 
@@ -113,7 +113,7 @@ Key architectural facts:
 - **Sigima is GUI-independent** (no Qt), organized in three layers: `sigima.objects` (data model: `SignalObj`, `ImageObj`, ROIs), `sigima.proc` (high-level computation functions on objects), `sigima.tools` (low-level NumPy algorithms).
 - **SigimaX separates the generic Qt application skeleton** (main window, `OptionField` configuration, dockable plot widgets, HDF5 browser/workspace, scientific dialogs) from DataLab's domain-specific signal/image workflows.
 - **Processing parameters are declarative** `guidata` DataSets: every edition auto-generates its parameter dialogs from the same schemas (Qt widgets on desktop, React forms on the web).
-- **The processing catalog is discovered by introspection**: a function registered in Sigima with `@computation_function` automatically appears in the desktop menus, the web menus, and the kernel API — no per-edition wiring.
+- **The processing catalog is shared, its exposure is per edition**: a function declared in Sigima with `@computation_function` carries its operation contract (identifier, version, inputs, parameters, replay qualification), discovered by introspection, so that an operation recorded in the provenance of one edition can be identified and replayed by another. Exposing it to users remains an integration step of each edition: the desktop registers it in its processors and menus (which also makes it available to remote control and to the kernel), while DataLab-Web derives its menus from the catalog, with per-feature overrides (titles, menu paths, icons).
 - **Interoperability and provenance are contract-based**: the HDF5 workspace format, the `/DataLab_Provenance` ledger, the RO-Crate `.dlcapsule` format (`DataLab-Capsule`), the renderer-independent plot annotations, the object model, and the remote-control API surfaces are shared contracts between editions.
 
 ## The products in detail
@@ -163,10 +163,10 @@ The reusable Qt GUI framework extracted from DataLab for building scientific des
 The full platform in a browser tab — zero install, zero server, zero upload.
 
 - **Repository**: [DataLab-Platform/web](https://github.com/DataLab-Platform/web) · **Live demo**: [datalab-platform.com/web](https://datalab-platform.com/web/)
-- **Runtime**: [Pyodide](https://pyodide.org/) (CPython compiled to WebAssembly) executes Sigima **locally in the browser** — data never leaves the user's machine. Static hosting is enough (the demo runs on GitHub Pages).
+- **Runtime**: [Pyodide](https://pyodide.org/) (CPython compiled to WebAssembly) executes Sigima **locally in the browser** — processing never requires uploading data. Static hosting is enough (the demo runs on GitHub Pages). Network services are used only when the user enables them: the AI assistant (with the provider the user configures) and the publication of capsules to a registry.
 - **UI**: custom React + TypeScript interface modelled on the desktop application, with Plotly.js visualization (canvas-rasterized level-of-detail image rendering for large arrays).
 - **Off-thread execution**: the whole Python runtime lives by default in a dedicated Web Worker behind a typed façade, with zero-copy transfers — the UI never freezes during computation.
-- **On-disk storage**: an optional OPFS (Origin Private File System) engine spills heavy arrays to disk, lifting the ~2 GB WebAssembly memory ceiling — the working set becomes bounded by disk quota, not RAM.
+- **On-disk storage**: an optional OPFS (Origin Private File System) engine spills heavy arrays to disk, so that the workspace can hold more data than the ~2 GB WebAssembly heap (up to the disk quota). Each operation still needs its own inputs and results in the heap, with their temporary copies, and saving a workspace or exporting a capsule currently loads all its arrays back: the memory needed by these operations remains bounded by the heap.
 - **Interruptible batch processing**: multi-object operations can be cancelled at object boundaries.
 - **Feature parity highlights**: signals, images, ROIs, the full Sigima processing catalog with optional live previews, interactive fits, HDF5 workspace import/export, end-to-end workspace provenance and `.dlcapsule` capsules, **Applications** catalog with live instrument simulators (bundled Camera & Pulse characterization plugins), plugins, macros, multi-tab notebooks, command palette, guided tours, AI assistant panel, demo/application deep links, and 70+ scientific colormaps.
 - **SDK**: a TypeScript host SDK (`@datalab-platform/web-sdk`) allows embedding and remote-controlling DataLab-Web via `postMessage`.
@@ -234,9 +234,9 @@ The differences are about the **runtime environment**, not about the science.
 | File access | Native file system I/O | Browser file picker, drag-and-drop |
 | Persistence & provenance | HDF5 & `.dlcapsule` on disk | HDF5 & `.dlcapsule` download / upload (interoperable) |
 | Plugins & Applications | Installed from catalog, `.whl`, or `.py` | Bundled official apps + in-browser plugin manager |
-| Memory | Limited by system RAM (64-bit) | ~2 GB WASM heap by default; optional OPFS on-disk storage mode lifts the limit (bounded by disk quota) |
+| Memory | Limited by system RAM (64-bit) | ~2 GB WASM heap; optional OPFS on-disk storage keeps the stored workspace beyond it (bounded by disk quota), each operation still working in the heap |
 | Remote control | XML-RPC and FastAPI Web API | In-browser proxy and optional `postMessage` SDK |
-| Privacy | Local | Local too — no server, no account, no upload |
+| Privacy | Local | Local processing — no server, no account, no upload; optional AI assistant and capsule registry |
 
 What is **not** different: the object model (`SignalObj`, `ImageObj`, ROIs, groups), the processing catalog, the auto-generated parameter dialogs, the portable plot annotations, the HDF5 workspace format, and the `/DataLab_Provenance` & `.dlcapsule` verification model.
 
@@ -246,10 +246,10 @@ The table describes the next development releases: the Desktop packages and Plot
 
 | Product | Version | Core stack |
 | --- | --- | --- |
-| DataLab (desktop) | 1.x | Python 3.10+, Qt (SigimaX ≥ 1.1, PlotPy ≥ 2.11, guidata ≥ 3.16), Sigima ≥ 1.3, DataLab-Capsule, NumPy, SciPy, scikit-image, OpenCV, FastAPI (Web API) |
+| DataLab (desktop) | 1.x | Python 3.10+, Qt (SigimaX ≥ 1.1, PlotPy ≥ 2.11, guidata ≥ 3.16), Sigima ≥ 1.4, DataLab-Capsule, NumPy, SciPy, scikit-image, OpenCV, FastAPI (Web API) |
 | Sigima | 1.x | Python 3.10+, NumPy, SciPy, scikit-image, pandas, guidata (parameters only) — no GUI dependency |
-| SigimaX | 1.x | Python 3.10+, Qt (PlotPy ≥ 2.11, guidata ≥ 3.15), Sigima ≥ 1.3, psutil |
-| DataLab-Web | 0.x | TypeScript, React, Plotly.js, Vite, Pyodide (pinned, worker runtime), Sigima, DataLab-Capsule, Vitest, Playwright |
+| SigimaX | 1.x | Python 3.10+, Qt (PlotPy ≥ 2.11, guidata ≥ 3.15), Sigima ≥ 1.4, psutil |
+| DataLab-Web | 0.x | TypeScript, React, Plotly.js, Vite, Pyodide (pinned, worker runtime), Sigima (pinned, may lag the desktop requirement), DataLab-Capsule, Vitest, Playwright |
 | DataLab-Kernel | 0.x | Python 3.10+, Xeus-Python, Plotly / Matplotlib backends, DataLab Web API client |
 | DataLab-Capsule | 0.x | Python 3.10+ / Pyodide, jsonschema, NumPy & h5py (`hdf5` extra), FastAPI & uvicorn (`registry` extra) |
 | PlotPyStack (foundation) | — | Python 3.10+, guidata, PythonQwt, PlotPy (Qt via QtPy: PyQt5/PyQt6/PySide6) |
@@ -281,7 +281,7 @@ Publicly announced directions (see the [wiki reports](https://github.com/DataLab
 - **Accessibility and security** (DEW Task 3): WCAG-driven accessibility improvements and a security hardening pass on DataLab-Web.
 - **Official application plugins**: advancing the Camera & Detector Characterization and Pulse & Transient Characterization plugins from Alpha to Stable with real-instrument validation campaigns, and expanding the [DataLab Plugin Catalog](https://datalab-platform.com/plugins/).
 - **wasm64**: transitioning DataLab-Web to 64-bit WebAssembly once stable, natively lifting the memory ceiling.
-- Continuous growth of the **Sigima processing catalog**, automatically surfacing in every edition.
+- Continuous growth of the **Sigima processing catalog**, made available in every edition.
 
 ## Resources and links
 
