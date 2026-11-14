@@ -35,14 +35,14 @@ The **DataLab Platform** is an open-source ecosystem for scientific and technica
 What started in 2023 as a single desktop application has grown into a family of complementary products sharing one scientific core:
 
 - a **desktop application** (DataLab) with a rich Qt-based interactive GUI,
-- a **browser-native edition** (DataLab-Web) running entirely client-side via WebAssembly — no install, no server, no upload,
+- a **browser-native edition** (DataLab-Web) running processing client-side via WebAssembly — no install or upload required for local processing,
 - a **Jupyter kernel** (DataLab-Kernel) for notebook-driven workflows,
 - a **headless computation engine** (Sigima) powering all of the above,
 - a **reusable Qt application framework** (SigimaX) extracted from DataLab for building scientific desktop applications,
 - an **open workspace provenance and capsule package** (DataLab-Capsule) for exchanging, comparing, and verifying analyses across editions,
 - a **plugin catalog and official application plugins** extending both Desktop and Web with domain-specific workflows and instrument simulators.
 
-The guiding principle: **one processing catalog, one object model, one workspace and provenance format — several access modes**. The same operation applied to the same imported data with compatible Sigima versions gives the same result in every edition — exactly, or within the comparison rule declared by the operation's replay qualification — and HDF5 workspaces and `.dlcapsule` archives flow freely between them. Editions may run different Sigima versions (DataLab-Web pins its own) and keep their own file importers, so equivalence is a verified property of each operation, not a blanket promise.
+The guiding principle: **a shared scientific engine and object model, with several access modes**. Each edition exposes its own selection of operations. Compatible Sigima versions use the same algorithms, but cross-host numerical equivalence depends on the operation, inputs and numerical environment; some operations declare an exact or tolerance-based replay comparison and others have no declared comparison rule. HDF5 workspaces and `.dlcapsule` archives can be exchanged within the limits of each edition.
 
 ## Terminology
 
@@ -50,7 +50,7 @@ The guiding principle: **one processing catalog, one object model, one workspace
 | --- | --- |
 | **DataLab Platform** | The umbrella term for the whole ecosystem (all products below). |
 | **DataLab** | The reference **desktop application** (Qt-based). The historical product. |
-| **DataLab-Web** | The **browser-native** edition: the full platform running inside a browser tab. |
+| **DataLab-Web** | The **browser-native** edition running inside a browser tab, with a curated selection of platform features. |
 | **DataLab-Kernel** | A **Jupyter kernel** exposing DataLab workspaces to notebooks. |
 | **Sigima** | The headless **computation engine** (signal and image processing) shared by all of the above. |
 | **SigimaX** | The reusable **Qt application framework** (main window skeleton, configuration, plot docks, HDF5 workspace, scientific widgets) on which DataLab Desktop is built. |
@@ -160,7 +160,7 @@ The reusable Qt GUI framework extracted from DataLab for building scientific des
 
 ### DataLab-Web (browser-native)
 
-The full platform in a browser tab — zero install, zero server, zero upload.
+DataLab in a browser tab — local processing requires no installation, server or upload. Optional services such as a configured AI provider or capsule registry can receive data when used.
 
 - **Repository**: [DataLab-Platform/web](https://github.com/DataLab-Platform/web) · **Live demo**: [datalab-platform.com/web](https://datalab-platform.com/web/)
 - **Runtime**: [Pyodide](https://pyodide.org/) (CPython compiled to WebAssembly) executes Sigima **locally in the browser** — processing never requires uploading data. Static hosting is enough (the demo runs on GitHub Pages). Network services are used only when the user enables them: the AI assistant (with the provider the user configures) and the publication of capsules to a registry.
@@ -168,7 +168,7 @@ The full platform in a browser tab — zero install, zero server, zero upload.
 - **Off-thread execution**: the whole Python runtime lives by default in a dedicated Web Worker behind a typed façade, with zero-copy transfers — the UI never freezes during computation.
 - **On-disk storage**: an optional OPFS (Origin Private File System) engine spills heavy arrays to disk, so that the workspace can hold more data than the ~2 GB WebAssembly heap (up to the disk quota). Each operation still needs its own inputs and results in the heap, with their temporary copies, and saving a workspace or exporting a capsule currently loads all its arrays back: the memory needed by these operations remains bounded by the heap.
 - **Interruptible batch processing**: multi-object operations can be cancelled at object boundaries.
-- **Feature parity highlights**: signals, images, ROIs, the full Sigima processing catalog with optional live previews, interactive fits, HDF5 workspace import/export, end-to-end workspace provenance and `.dlcapsule` capsules, **Applications** catalog with live instrument simulators (bundled Camera & Pulse characterization plugins), plugins, macros, multi-tab notebooks, command palette, guided tours, AI assistant panel, demo/application deep links, and 70+ scientific colormaps.
+- **Feature highlights**: signals, images, ROIs, a curated Sigima processing catalog with optional live previews, interactive fits, HDF5 workspace import/export, workspace provenance and `.dlcapsule` capsules, **Applications** catalog with live instrument simulators (bundled Camera & Pulse characterization plugins), plugins, macros, multi-tab notebooks, command palette, guided tours, AI assistant panel, demo/application deep links, and 70+ scientific colormaps.
 - **SDK**: a TypeScript host SDK (`@datalab-platform/web-sdk`) allows embedding and remote-controlling DataLab-Web via `postMessage`.
 - **Languages**: English and French, with automatic browser-language detection.
 
@@ -213,8 +213,8 @@ An open plugin ecosystem and domain-specific scientific applications shared acro
 The editions are not competitors — they are interchangeable access modes:
 
 - **HDF5 workspaces** are the common persistence format: a workspace saved on desktop opens in DataLab-Web, in a notebook, and vice versa, with portable renderer-independent plot annotations.
-- **Workspace provenance and `.dlcapsule` archives** are recorded and verified identically by DataLab Desktop and DataLab-Web using `DataLab-Capsule`: a result computed on the web can be inspected and recomputed on the desktop (and vice versa).
-- **The processing catalog** is discovered from Sigima in every edition: same functions, same parameters, same results.
+- **Workspace provenance and `.dlcapsule` archives** use `DataLab-Capsule` in both editions. Recorded results can be inspected and, where supported and qualified, recomputed across editions.
+- **The processing catalog** is based on Sigima in every edition, with different selections exposed by each host.
 - **Parameter dialogs** are auto-generated from the same guidata DataSet schemas everywhere.
 - **Plugins and Applications** are portable between desktop and web: the same plugin recipes, examples, and instrument simulators run in both editions.
 - **Remote control** surfaces: XML-RPC and Web API on desktop; in-browser proxy and `postMessage` SDK on the web; live synchronization from notebooks via DataLab-Kernel.
@@ -234,11 +234,11 @@ The differences are about the **runtime environment**, not about the science.
 | File access | Native file system I/O | Browser file picker, drag-and-drop |
 | Persistence & provenance | HDF5 & `.dlcapsule` on disk | HDF5 & `.dlcapsule` download / upload (interoperable) |
 | Plugins & Applications | Installed from catalog, `.whl`, or `.py` | Bundled official apps + in-browser plugin manager |
-| Memory | Limited by system RAM (64-bit) | ~2 GB WASM heap; optional OPFS on-disk storage keeps the stored workspace beyond it (bounded by disk quota), each operation still working in the heap |
+| Memory | Limited by system RAM (64-bit) | ~2 GB WASM heap; optional OPFS storage can hold more data, but operations must fit in the heap and workspace saves and capsule exports load all arrays into memory |
 | Remote control | XML-RPC and FastAPI Web API | In-browser proxy and optional `postMessage` SDK |
 | Privacy | Local | Local processing — no server, no account, no upload; optional AI assistant and capsule registry |
 
-What is **not** different: the object model (`SignalObj`, `ImageObj`, ROIs, groups), the processing catalog, the auto-generated parameter dialogs, the portable plot annotations, the HDF5 workspace format, and the `/DataLab_Provenance` & `.dlcapsule` verification model.
+Both editions share the Sigima object model, parameter schemas and provenance format, but differ in their exposed operations and supported interactions. In particular, Web ignores Desktop History and removes it when saving a workspace again; keep the original file if that history is needed.
 
 ## Technology stacks
 
@@ -246,9 +246,9 @@ The table describes the next development releases: the Desktop packages and Plot
 
 | Product | Version | Core stack |
 | --- | --- | --- |
-| DataLab (desktop) | 1.x | Python 3.10+, Qt (SigimaX ≥ 1.1, PlotPy ≥ 2.11, guidata ≥ 3.16), Sigima ≥ 1.4, DataLab-Capsule, NumPy, SciPy, scikit-image, OpenCV, FastAPI (Web API) |
+| DataLab (desktop) | 1.x | Python 3.10+, Qt (SigimaX ≥ 1.1.0, PlotPy ≥ 2.12.1, guidata ≥ 3.17.2), Sigima ≥ 1.4.0, DataLab-Capsule ≥ 0.2.0 and < 0.3, NumPy, SciPy, scikit-image, OpenCV, FastAPI (Web API) |
 | Sigima | 1.x | Python 3.10+, NumPy, SciPy, scikit-image, pandas, guidata (parameters only) — no GUI dependency |
-| SigimaX | 1.x | Python 3.10+, Qt (PlotPy ≥ 2.11, guidata ≥ 3.15), Sigima ≥ 1.4, psutil |
+| SigimaX | 1.x | Python 3.10+, Qt (PlotPy ≥ 2.12.1, guidata ≥ 3.17.2), Sigima ≥ 1.4.0, psutil |
 | DataLab-Web | 0.x | TypeScript, React, Plotly.js, Vite, Pyodide (pinned, worker runtime), Sigima (pinned, may lag the desktop requirement), DataLab-Capsule, Vitest, Playwright |
 | DataLab-Kernel | 0.x | Python 3.10+, Xeus-Python, Plotly / Matplotlib backends, DataLab Web API client |
 | DataLab-Capsule | 0.x | Python 3.10+ / Pyodide, jsonschema, NumPy & h5py (`hdf5` extra), FastAPI & uvicorn (`registry` extra) |
